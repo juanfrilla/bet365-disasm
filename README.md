@@ -126,13 +126,10 @@ _0xcb42bb[83] = function () {
 ```
 Where:
 
-_0xcb42bb is the dispatch table (array of handler functions).
-
-_0x555150 is the decoded bytecode buffer.
-
-_0x1ad981[141] is the program counter (pc).
-
-_0x1ad981 is the register array (VM state).
+- _0xcb42bb is the dispatch table (array of handler functions).
+- _0x555150 is the decoded bytecode buffer.
+- _0x1ad981[141] is the program counter (pc).
+- _0x1ad981 is the register array (VM state).
 
 This means the VM's main loop is conceptually:
 
@@ -162,13 +159,21 @@ This conversion does not change the semantics — it is purely a readability imp
 
 This process produces the opcode table where each entry records:
 
-The numeric opcode value.
+- The address after the execution of the handler
+- A human-readable mnemonic (e.g., MOV, JMP, CALL_FUNC).
+- The handler logic (what the VM does when executing that opcode).
+- The number and type of operands it consumes.
 
-A human-readable mnemonic (e.g., MOV, JMP, CALL_FUNC).
-
-The handler logic (what the VM does when executing that opcode).
-
-The number and type of operands it consumes.
+e.g
+```javascript
+case 93: {
+    var dst = bytecode[state.pc++];
+    var src1 = bytecode[state.pc++];
+    var src2 = bytecode[state.pc++];
+    instructions.push(`[ ${state.pc} ] ADD R${dst} = R${src1} + R${src2}`);
+    break;
+}
+```
 
 Some opcodes may appear duplicated or share similar names (e.g., LESS THAN for both 77 and 244). These are either aliases, encoding quirks, or errors in the original VM. They must be verified against the actual execution.
 
@@ -180,13 +185,12 @@ For every opcode handler, we need to determine exactly how many bytes are consum
 For example:
 
 ```javascript
-case 144: {
-    var dst = bytecode[pc++];
-    var src = bytecode[pc++];
-
-    registers[dst] = registers[src];
-    break;
-}
+    _0xcb42bb[144] = function () {
+      var _0xff4c85 = _0x555150[_0x1ad981[141]++];
+      var _0x1d616e = _0x555150[_0x1ad981[141]++];
+      _0x1d616e = _0x1ad981[_0x1d616e];
+      _0x1ad981[_0xff4c85] = _0x1d616e;
+    };
 ```
 
 This tells us that opcode `144` has the following bytecode layout:
@@ -198,26 +202,10 @@ This tells us that opcode `144` has the following bytecode layout:
 and consumes:
 
 ```text
-1 opcode byte
-2 operand bytes
+1 opcode byte (inside the while true)
+2 operand bytes (inside the handler)
 ----------------
 3 bytes total
-```
-
-For variable-length instructions, the number of consumed bytes may depend on an operand:
-
-```javascript
-case 80: {
-    var dst = bytecode[pc++];
-    var ctor = bytecode[pc++];
-    var argc = bytecode[pc++];
-
-    for (var i = 0; i < argc; i++) {
-        var arg = bytecode[pc++];
-    }
-
-    break;
-}
 ```
 
 
@@ -234,6 +222,19 @@ function readInt32(bytecode, state) {
 }
 ```
 This function is used by opcodes such as 67 (CLOSURE), 73 (JMP), 83 (JMP_IF_FALSE), and many others that contain 32-bit addresses or integers.
+
+
+```javascript
+    _0xcb42bb[73] = function () {
+      var _0x4a55e6 =
+        (_0x555150[_0x1ad981[141]++] << 24) |
+        (_0x555150[_0x1ad981[141]++] << 16) |
+        (_0x555150[_0x1ad981[141]++] << 8) |
+        _0x555150[_0x1ad981[141]++];
+      _0x1ad981[141] = _0x4a55e6;
+    };
+```
+
 
 All of this information was extracted directly from the client-side code of the VM. Nothing was invented; every operand layout and consumption rule was derived by debugging the actual execution and reading the original implementation.
 
