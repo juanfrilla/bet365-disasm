@@ -279,8 +279,11 @@ Disassembly:
 
 By recovering the operand consumption and semantics of each opcode, the VM's bytecode can be progressively transformed from a raw binary representation into a readable instruction stream suitable for static analysis and further reverse engineering.
 
+## Execution
+`node disasm.js > out.txt`
 
-# 5. Opcode table
+
+## Opcode table
 
 | Opcode | Instruction            |
 | -----: | ---------------------- |
