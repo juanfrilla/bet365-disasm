@@ -223,7 +223,7 @@ case 80: {
 
 To read multi-byte operands, we use the readInt32 function, which reads a 32-bit big-endian integer from the bytecode and advances the program counter:
 
-javascript
+```javascript
 function readInt32(bytecode, state) {
   return (
     (bytecode[state.pc++] << 24) |
@@ -232,6 +232,7 @@ function readInt32(bytecode, state) {
     bytecode[state.pc++]
   );
 }
+```
 This function is used by opcodes such as 67 (CLOSURE), 73 (JMP), 83 (JMP_IF_FALSE), and many others that contain 32-bit addresses or integers.
 
 All of this information was extracted directly from the client-side code of the VM. Nothing was invented; every operand layout and consumption rule was derived by debugging the actual execution and reading the original implementation.
