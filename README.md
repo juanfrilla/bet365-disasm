@@ -8,7 +8,7 @@ Static disassembler for the **BET365 VM** that transforms encoded VM bytecode in
 
 ## Reverse Engineering Approach
 
-We start from the assumption that a JavaScript Virtual Machine (JSVM) can be reduced to a structure similar to the following and nothing here is invented; all the information we needed was obtained by debugging directly in the browser the javascript code:
+We start from the assumption that a JavaScript Virtual Machine (JSVM) can be reduced to a structure similar to the following and nothing here is invented; all the information we needed was obtained through dynamic analysis (debugging directly in the browser the javascript code) or static analysis (reading the original JavaScript source code):
 
 ```javascript
 var base64Bytecode = "bigStringBase64Encoded...";
@@ -44,8 +44,6 @@ VM(bytecode);
 ```
 
 The exact implementation will vary between JSVMs, but the general architecture is often based on a **bytecode decoder**, a **program counter (`pc`)**, and an **interpreter loop** that dispatches instructions according to their opcode.
-
-Nothing here is invented; all the information we needed was obtained by debugging directly in the browser the javascript code.
 
 ### Step 1 — Identify the Bytecode Decoder
 
@@ -175,7 +173,7 @@ case 93: {
 }
 ```
 
-Some opcodes may appear duplicated or share similar names (e.g., LESS THAN for both 77 and 244). These are either aliases, encoding quirks, or errors in the original VM. They must be verified against the actual execution.
+Some opcodes may appear duplicated or share similar names (e.g., LESS THAN for both 77 and 244).
 
 
 ### Step 4 — Determine Operand Consumption
